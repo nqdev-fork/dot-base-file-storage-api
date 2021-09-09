@@ -8,6 +8,10 @@ router.post("/:context/:fhirId", async (req, res) => {
     const fhirAttachment = await FileUpload.handleUpload(req);
     res.status(200).send(fhirAttachment);
   } catch (e) {
+    if (e instanceof TypeError) {
+      res.status(415).send(e);
+      return;
+    }
     res.status(500).send(e);
   }
 });

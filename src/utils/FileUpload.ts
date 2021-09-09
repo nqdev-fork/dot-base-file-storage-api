@@ -68,6 +68,7 @@ export default class FileUpload {
     const form = FileUpload.initializeUploadForm(uploadDir);
     const filesMap = await FileUpload.parseForm(req, form);
     const files = Object.values(filesMap);
+    // TODO delete multiple files if uploaded, mv deletion to here, cover multiple files case
     if (files.length !== 1) throw new Error("You should submit exactly one file.");
     // files can be assumed as File because the multiples option of the IncomingForm
     // was set to false
@@ -82,7 +83,7 @@ export default class FileUpload {
 
     if (!FileUpload.filetypeIsWhitelisted(file)) {
       fs.unlinkSync(file.path);
-      throw new Error(
+      throw new TypeError(
         "Invalid file type. The server only accepts files with one the following extensions: jpg, json, mp4, pdf, ply or png."
       );
     }
