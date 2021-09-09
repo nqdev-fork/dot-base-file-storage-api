@@ -24,12 +24,14 @@ export default class FileUpload {
   private static initializeUploadForm(uploadDirectory: string): Formidable {
     const form = new IncomingForm({
       keepExtensions: true,
-      allowEmptyFiles: false,
       multiples: false,
+      allowEmptyFiles: false,
       maxFieldsSize: 0, // = unlimited
       maxFileSize: 4000 * 1024 * 1024, // = 4 gb
     });
+
     form.on("fileBegin", function (name, file) {
+      if (!FileUpload.filetypeIsWhitelisted(file)) return;
       const fileExtension = file.path.split(".").pop();
       const newPath = `${uploadDirectory}/${uuid()}.${fileExtension}`;
       // this prevents directory traversal attacks
@@ -38,6 +40,7 @@ export default class FileUpload {
         file.path = newPath;
       }
     });
+
     return form;
   }
 
