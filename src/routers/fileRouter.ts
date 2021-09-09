@@ -1,19 +1,12 @@
 import express from "express";
-
-import FileService from "@/services/FileService";
+import FileUpload from "@/utils/FileUpload";
 
 const router: express.Router = express.Router();
-const fileService = new FileService();
 
-router.use("/", express.static(FileService.uploadDirectory));
-
-router.post("/", async (req, res) => {
+router.post("/:context/:fhirId", async (req, res) => {
   try {
-    const filePath = await fileService.handleUpload(req);
-    const protocol =
-      process.env.NODE_ENV === "development" || process.env.INSECURE ? "http://" : "https://";
-    const fileUrl = new URL(filePath, protocol + process.env.DOMAIN + "/api/files/");
-    res.status(200).send(fileUrl.href);
+    const fhirAttachment = await FileUpload.handleUpload(req);
+    res.status(200).send(fhirAttachment);
   } catch (e) {
     res.status(500).send(e);
   }
