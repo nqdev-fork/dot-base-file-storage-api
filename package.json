@@ -1,7 +1,7 @@
 {
   "name": "file-storage-api",
   "description": "API submit files using multipart forms and statically serve them afterwards.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "start": "nodemon --watch 'src/**/*' -e ts --exec 'npm run watch'",
@@ -22,8 +22,8 @@
     "express": "^4.17.1",
     "formidable": "^1.2.2",
     "tsconfig-paths": "^3.9.0",
-    "tslib": "^2.0.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "tslib": "^2.3.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.8",
@@ -38,8 +38,8 @@
     "jest": "^26.4.1",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.1.2"
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
   },
   "eslintConfig": {
     "root": true,

@@ -3,6 +3,7 @@
     "outDir": "./build",
     "esModuleInterop": true,
     "strict": true,
+    "useUnknownInCatchVariables": false,
     "module": "commonjs",
     "target": "es5",
     "importHelpers": true,
