@@ -24,7 +24,6 @@ Want a File Storage API of your own? The easiest way is to deploy our docker con
     export DOMAIN=localhost:3000 // or
     export DOMAIN=github.com
     ```
-1. [optional] Set `INSECURE` to `true` if you are NOT using HTTPS.
 1. Start the container with a single command
     ```
     docker run --name file-storage-api -p 3000:3000 -d ghcr.io/dot-base/file-storage-api:latest
