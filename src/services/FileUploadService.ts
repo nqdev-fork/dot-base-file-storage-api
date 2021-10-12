@@ -62,9 +62,9 @@ export default class FileUploadService {
     return file.path.match(supportedFiletypesMatcher) ? true : false;
   }
 
-  private urlOf(path: string): string {
+  private urlOf(filepath: string): string {
     const protocol = process.env.NODE_ENV === "development" ? "http://" : "https://";
-    const url = new URL(path, `${protocol}${process.env.DOMAIN ?? "localhost"}/api/`);
+    const url = new URL(filepath, `${protocol}${process.env.DOMAIN ?? "localhost"}/api/`);
     return url.href;
   }
 
@@ -125,15 +125,14 @@ export default class FileUploadService {
 
   public async handleUpload(req: Request): Promise<fhir.IAttachment> {
     this.validateRequest(req);
-    const uploadDir = this.uploadDirectory(req.params.context, req.params.fhirId);
+    const uploadDir: string = this.uploadDirectory(req.params.context, req.params.fhirId);
     this.createDirIfNotExists(uploadDir);
     const file = await this.save(req, uploadDir);
-    const url = this.urlOf(file.path);
 
     return FhirResourceBuilder.attachment(
       file.type,
       file.name,
-      url,
+      this.urlOf(file.path),
       file.lastModifiedDate?.toISOString()
     );
   }

@@ -1,8 +1,8 @@
-import express from "express";
+import { Express } from "express";
 import cors from "cors";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
-
+import app from "@/app";
 import fileRouter from "@/routers/fileRouter";
 
 class StorageApi {
@@ -14,9 +14,7 @@ class StorageApi {
     return !!process.env.SENTRY_DSN && !!process.env.SENTRY_ENVIRONMENT;
   }
 
-  private async startApiServer() {
-    const app = express();
-
+  private async startApiServer(app: Express) {
     if (StorageApi.sentryIsEnabled) {
       Sentry.init({
         dsn: process.env.SENTRY_DSN,
@@ -45,9 +43,9 @@ class StorageApi {
     });
   }
 
-  constructor() {
-    this.startApiServer();
+  constructor(app: Express) {
+    this.startApiServer(app);
   }
 }
 
-new StorageApi();
+new StorageApi(app);
