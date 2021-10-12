@@ -24,7 +24,7 @@ export default class FileUploadService {
 
   private changeFilePath(file: File, uploadDirectory: string): void {
     const fileExtension = /\.\w+$/g.exec(file.path);
-    const newPath = `${uploadDirectory}/${uuid()}.${fileExtension}`;
+    const newPath = `${uploadDirectory}/${uuid()}${fileExtension}`;
     // this prevents directory traversal attacks
     // where "../" is used to traverse other directories
     if (newPath.startsWith(uploadDirectory)) {
