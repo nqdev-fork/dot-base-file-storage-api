@@ -1,7 +1,7 @@
 import request from "supertest"
 import fs from "fs"
 import app from "@/app"
-import { deleteAllFiles, fileExtension, fileExtensionOfUplodedFile, uploadedFileToExist } from "./utils"
+import { deleteAllFiles, fileExtension, localFilepath, uploadedFileToExist } from "./utils"
 
 describe("File Upload", () => {
     const pathToPdfFile = "./tests/mocks/sample.pdf"
@@ -18,7 +18,7 @@ describe("File Upload", () => {
         
         expect(res.status).toBe(200)
         expect(uploadedFileToExist(res))
-        expect(fileExtensionOfUplodedFile(res)).toBe(fileExtension(pathToPdfFile))
+        expect(fileExtension(localFilepath(res))).toBe(fileExtension(pathToPdfFile))
     })
 
     test("POST /api/files/study/2342ofisho8f uploads file", async () => {
@@ -28,7 +28,7 @@ describe("File Upload", () => {
         
         expect(res.status).toBe(200)
         expect(uploadedFileToExist(res))
-        expect(fileExtensionOfUplodedFile(res)).toBe(fileExtension(pathToPdfFile))
+        expect(fileExtension(localFilepath(res))).toBe(fileExtension(pathToPdfFile))
     })
 
     test("POST /api/files/..%2Fsrc/123 handles directory travel attempt", async () => {

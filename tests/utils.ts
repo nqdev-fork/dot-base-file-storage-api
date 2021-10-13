@@ -18,7 +18,3 @@ export function uploadedFileToExist(res: request.Response): boolean {
 export function fileExtension(path: string): string {
     return /\.\w+$/g.exec(path)?.[0] || "";
 }
-
-export function fileExtensionOfUplodedFile(res: request.Response): string {
-    return fileExtension(localFilepath(res))
-}
