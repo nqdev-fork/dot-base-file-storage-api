@@ -8,7 +8,7 @@ import FhirResourceBuilder from "@/utils/FhirResourceBuilder";
 import { v4 as uuid } from "uuid";
 import { strict as assert } from "assert";
 
-export default class FileUploadService {
+export default class FileService {
   private supportedFileExtensions = ["jpg", "json", "mp4", "pdf", "ply", "png"];
 
   private uploadDirectory(context: string, fhirId: string): string {

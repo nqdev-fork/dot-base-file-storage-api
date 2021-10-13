@@ -1,8 +1,8 @@
 import express from "express";
-import FileUploadService from "@/services/FileUploadService";
+import FileService from "@/services/FileService";
 
 const router: express.Router = express.Router();
-const fileUpload = new FileUploadService();
+const fileUpload = new FileService();
 
 router.post("/:context/:fhirId", async (req, res) => {
   try {
