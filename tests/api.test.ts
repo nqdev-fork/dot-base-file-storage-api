@@ -1,11 +1,10 @@
 import request from "supertest"
-import fs from "fs"
 import app from "@/app"
 import { deleteAllFiles, fileExtension, localFilepath, uploadedFileToExist } from "./utils"
 
 describe("File Upload", () => {
     const pathToPdfFile = "./tests/mocks/sample.pdf"
-    const pathToSvgFile = "./tests/mocks/sample.svg"
+    const pathToSvgFile = "./tests/mocks/drawing.svg"
 
     afterEach(() => {
         deleteAllFiles()
@@ -43,7 +42,7 @@ describe("File Upload", () => {
     test("POST /api/files/clinical/12345 rejects unsupported file extensions", async () => {
         const res = await request(app)
         .post("/api/files/clinical/12345")
-        .attach("sample.svg", pathToSvgFile)
+        .attach("drawing.svg", pathToSvgFile)
         
         expect(res.status).toBe(415)
         expect(uploadedFileToExist(res)).toBeFalsy()
@@ -52,7 +51,7 @@ describe("File Upload", () => {
     test("POST /api/files/clinical/12345 rejects when no file sent", async () => {
         const res = await request(app)
         .post("/api/files/clinical/12345")
-        .attach("sample.svg", null as unknown as string) // as unknown first stops ts complaining
+        .attach("sample", null as unknown as string) // as unknown first stops ts complaining
         
         expect(res.status).toBe(500)
         expect(uploadedFileToExist(res)).toBeFalsy()

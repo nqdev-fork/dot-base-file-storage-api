@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2">
+    <rect
+       x="130.4261"
+       y="166.77435"
+       width="532.39505"
+       height="694.89314"
+       id="rect10049" />
+    <rect
+       x="177.46502"
+       y="200.98448"
+       width="380.58763"
+       height="218.08954"
+       id="rect1749" />
+  </defs>
+  <g
+     id="layer1">
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text1747"
+       style="fill:black;fill-opacity:1;line-height:1.25;stroke:none;font-family:sans-serif;font-style:normal;font-weight:normal;font-size:40px;white-space:pre;shape-inside:url(#rect1749)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="89.94857"
+       y="82.594284"
+       id="text2833"><tspan
+         id="tspan2831"
+         style="stroke-width:0.264583"
+         x="89.94857"
+         y="82.594284" /></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-1.6971429,0.56571429)"
+       id="text10047"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect10049);fill:#000000;fill-opacity:1;stroke:none"><tspan
+         x="130.42578"
+         y="203.26665"
+         id="tspan23130">An open source project </tspan><tspan
+         x="130.42578"
+         y="253.26665"
+         id="tspan23132">that provides a simple </tspan><tspan
+         x="130.42578"
+         y="303.26665"
+         id="tspan23134">graphical interface for the </tspan><tspan
+         x="130.42578"
+         y="353.26665"
+         id="tspan23136">clinical user, while data is </tspan><tspan
+         x="130.42578"
+         y="403.26665"
+         id="tspan23138">automatically stored in </tspan><tspan
+         x="130.42578"
+         y="453.26665"
+         id="tspan23140">Fast Healthcare </tspan><tspan
+         x="130.42578"
+         y="503.26665"
+         id="tspan23142">Interoperability Resources </tspan><tspan
+         x="130.42578"
+         y="553.26665"
+         id="tspan23144">(FHIR®).</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:19.7556px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="33.942856"
+       y="34.508572"
+       id="text18089"><tspan
+         id="tspan18087"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:19.7556px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';stroke-width:0.264583"
+         x="33.942856"
+         y="34.508572">dot.base</tspan></text>
+    <ellipse
+       id="path23053"
+       cx="51.762856"
+       cy="213.84"
+       rx="27.437143"
+       ry="26.588572"
+       style="stroke-width:0.264583" />
+    <path
+       id="path23077"
+       d="m 545.22383,861.66747 -89.27733,-49.35752 -91.27223,45.56302 19.35357,-100.16011 -71.53767,-72.7253 101.2385,-12.54483 47.05952,-90.50972 43.21526,92.40696 100.62205,16.78722 -74.52999,69.65549 z"
+       transform="scale(0.26458333)" />
+    <path
+       id="path23079"
+       d="m 463.97479,769.72778 0.0989,-19.04916 -15.6362,-10.88071 18.14739,-5.79249 5.51631,-18.23324 11.11684,15.46921 19.04547,-0.38805 -11.2768,15.35299 6.25444,17.9934 -18.08629,-5.98054 z"
+       transform="scale(0.26458333)" />
+  </g>
+</svg>
