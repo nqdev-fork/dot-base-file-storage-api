@@ -6,7 +6,6 @@ import Formidable from "formidable/Formidable";
 import { R4 as fhir } from "@ahryman40k/ts-fhir-types";
 import FhirResourceBuilder from "@/utils/FhirResourceBuilder";
 import { v4 as uuid } from "uuid";
-import { strict as assert } from "assert";
 
 export default class FileService {
   private supportedFileExtensions = ["jpg", "json", "mp4", "pdf", "ply", "png"];
@@ -54,17 +53,16 @@ export default class FileService {
     });
   }
 
-  private filetypeIsWhitelisted(file: File): boolean {
-    const supportedFiletypesMatcher = new RegExp(
-      `\.(${this.supportedFileExtensions.join("|")})$`,
-      "i"
-    );
-    return file.path.match(supportedFiletypesMatcher) ? true : false;
+  private isSupportedFileType(file: File): boolean {
+    const supportedFileTypes = this.supportedFileExtensions.join("|")
+    const supportedFiletypesRegEx = new RegExp(`\.(${supportedFileTypes})$`,"i");
+    return file.path.match(supportedFiletypesRegEx) ? true : false;
   }
 
   private urlOf(filepath: string): string {
     const protocol = process.env.NODE_ENV === "development" ? "http://" : "https://";
-    const url = new URL(filepath, `${protocol}${process.env.DOMAIN ?? "localhost"}/api/`);
+    const domain = process.env.DOMAIN ?? "localhost"
+    const url = new URL(filepath, `${protocol}${domain}/api/`);
     return url.href;
   }
 
@@ -101,7 +99,7 @@ export default class FileService {
       this.deleteFiles(files);
       throw new Error("You should submit exactly one file.");
     }
-    if (!this.filetypeIsWhitelisted(files[0])) {
+    if (!this.isSupportedFileType(files[0])) {
       this.deleteFiles(files);
       throw new TypeError(
         `Invalid file type. The server only accepts files with one the following extensions: ${this.supportedFileExtensions.join(
@@ -115,12 +113,25 @@ export default class FileService {
   private validateRequest(req: Request): void {
     const context = req.params.context;
     const fhirId = req.params.fhirId;
-    assert(context);
-    assert(fhirId);
+    const nonValidCharacters = /[^\p{L}0-9-]/u; // not(unicode letter, number, dash)
+    if (context.match(nonValidCharacters) || fhirId.match(nonValidCharacters))
+      throw Error("Context and Fhir ID must only contain unicode letters, digits or dashes.");
+  }
 
-    const notAlphanumericMatcher = /[^\p{L}0-9]/u;
-    if (notAlphanumericMatcher.test(context) || notAlphanumericMatcher.test(fhirId))
-      throw Error("Context and Fhir ID must be alphanumeric.");
+  private formatResponse(file: File): fhir.IAttachment {
+    const { type, name, path, lastModifiedDate } = file;
+    const missingFieldError = "The uploaded file is missing a required field";
+    if (type === null) throw new TypeError(`${missingFieldError} 'type'.`);
+    if (name === null) throw new Error(`${missingFieldError} 'name'.`);
+    if (path === null) throw new Error(`${missingFieldError} 'path'.`);
+    if (!lastModifiedDate) throw new Error(`${missingFieldError} 'lastModifiedDate'`);
+
+    return FhirResourceBuilder.attachment(
+      type,
+      name,
+      this.urlOf(path),
+      lastModifiedDate.toISOString()
+    );
   }
 
   public async handleUpload(req: Request): Promise<fhir.IAttachment> {
@@ -128,12 +139,6 @@ export default class FileService {
     const uploadDir: string = this.uploadDirectory(req.params.context, req.params.fhirId);
     this.createDirIfNotExists(uploadDir);
     const file = await this.save(req, uploadDir);
-
-    return FhirResourceBuilder.attachment(
-      file.type,
-      file.name,
-      this.urlOf(file.path),
-      file.lastModifiedDate?.toISOString()
-    );
+    return this.formatResponse(file)
   }
 }

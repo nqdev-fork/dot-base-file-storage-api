@@ -8,7 +8,7 @@ export function deleteAllFiles(): void {
 
 export function localFilepath(res: request.Response): string {
     const everythingAfterAPI = /.+\/api\/(.*)$/g // if exists, "/files/<context>/<id>.<extension>"
-    return `.${res.body?.attachment?.url.match(everythingAfterAPI)}`
+    return `.${res.body?.url?.match(everythingAfterAPI)}`
 }
 
 export function uploadedFileToExist(res: request.Response): boolean {

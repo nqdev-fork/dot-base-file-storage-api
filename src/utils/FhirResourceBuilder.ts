@@ -1,24 +1,15 @@
 import { R4 as fhir } from "@ahryman40k/ts-fhir-types";
 
 export default class FhirResourceBuilder {
-  public static attachment(
-    mimetype: string | null,
-    title: string | null,
-    url: string,
-    creation: string | undefined
+  public static attachment(mimetype: string, title: string,
+    url: string, creation: string
   ): fhir.IAttachment {
-    return {
-      attachment: {
-        contentType: {
-          system: "http://hl7.org/fhir/ValueSet/mimetypes",
-          value: mimetype,
-        },
-        title: {
-          value: title,
-        },
-        url: url,
-        creation: creation,
-      },
-    } as fhir.IAttachment;
+    const attachment: fhir.IAttachment = {
+      contentType: mimetype,
+      title: title,
+      url: url,
+      creation: creation,
+    }
+    return attachment
   }
 }
