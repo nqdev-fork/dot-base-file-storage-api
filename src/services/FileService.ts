@@ -21,14 +21,18 @@ export default class FileService {
     return fs.mkdirSync(path, { recursive: true });
   }
 
-  private changeFilePath(file: File, uploadDirectory: string): void {
+  private getUniqueFilePath(file: File, uploadDirectory: string): string {
     const fileExtension = /\.\w+$/g.exec(file.path);
-    const newPath = `${uploadDirectory}/${uuid()}${fileExtension}`;
-    // this prevents directory traversal attacks
-    // where "../" is used to traverse other directories
-    if (newPath.startsWith(uploadDirectory)) {
-      file.path = newPath;
+    const uniquePath = `${uploadDirectory}/${uuid()}${fileExtension}`;
+    //REVIEW: REPLACE COMMENT WITH DECRIPTIVE NAMING
+    const preventTraversalAttack = uniquePath.startsWith(uploadDirectory);
+
+    //REVIEW: Happy PATH SHOULD BE DEFAULT PATH + THROW ERROR HERE?
+    if (!preventTraversalAttack) {
+      throw new Error("Invalid upload directory.");
     }
+
+    return uniquePath;
   }
 
   private initializeUploadForm(uploadDirectory: string): Formidable {
@@ -40,74 +44,97 @@ export default class FileService {
       maxFieldsSize: 0, // = unlimited
       maxFileSize: 4000 * 1024 * 1024, // = 4 gb
     });
-    form.on("fileBegin", (name, file) => this.changeFilePath(file, uploadDirectory));
+
+    form.on("fileBegin", (name, file) => {
+      file.path = this.getUniqueFilePath(file, uploadDirectory);
+    });
+
     return form;
   }
 
-  private async parseRequest(req: Request, form: Formidable): Promise<Files> {
-    return new Promise(function (resolve, reject) {
-      form.parse(req, function (err, fields, files) {
-        if (err !== null) reject(err);
-        else resolve(files);
-      });
-    });
-  }
+  //REVIEW:
+  private parseRequest(req: Request, form: Formidable): Files {
+    let uploadFiles: Files = {};
 
-  private isSupportedFileType(file: File): boolean {
-    const supportedFileTypes = this.supportedFileExtensions.join("|")
-    const supportedFiletypesRegEx = new RegExp(`\.(${supportedFileTypes})$`,"i");
-    return file.path.match(supportedFiletypesRegEx) ? true : false;
+    form.parse(req, (err, fields, files) => {
+      if (err !== null) throw new Error(`Parsing of uploaded files failed: ${err}.`);
+      else uploadFiles = files;
+    });
+
+    return uploadFiles;
   }
 
   private urlOf(filepath: string): string {
     const protocol = process.env.NODE_ENV === "development" ? "http://" : "https://";
-    const domain = process.env.DOMAIN ?? "localhost"
+    const domain = process.env.DOMAIN ?? "localhost";
     const url = new URL(filepath, `${protocol}${domain}/api/`);
     return url.href;
   }
 
+  //REVIEW: SHOULDN'T USING 'recursive:true' WORK HERE?
+  //OTHERWISE I WOULD ADD AT LEAST A 2nd FUNCTION 'deleteDirectory'
   private deleteEmptyDirectories(filepath: string) {
-    const baseDir = path.dirname(filepath).split("/");
-    for (let depth = baseDir.length; depth > 1; depth--) {
-      const dir = baseDir.slice(0, depth).join("/");
-      try {
-        fs.rmdirSync(dir);
-      } catch (e) {
-        // this error happens when files already exists in the dir
-        if (e.code === "ENOTEMPTY") continue;
-        // this error happens when no file is sent. In this
-        // case a temporary file is saved in /tmp/<random>,
-        // but /tmp may not be deleted
-        if (e.code === "EACCES") continue;
-        throw e;
-      }
+    try {
+      const directory = path.dirname(filepath);
+      fs.rmdirSync(directory, { recursive: true });
+    } catch (e) {
+      //REVIEW: AVOID COMMENTS WITH DECRIPTIVE NAMING
+      const fileAlreadyExists = "ENOTEMPTY";
+      const noFileSaved = "EACCES";
+      if (e.code === fileAlreadyExists) return;
+      //In this case file is saved in /tmp/<random>,but /tmp may not be deleted
+      if (e.code === noFileSaved) return;
+      throw e;
     }
   }
 
-  private deleteFiles(files: File[]) {
-    files.map((file) => {
-      fs.unlinkSync(file.path);
-      this.deleteEmptyDirectories(file.path);
-    });
+  //REVIEW: I WOULD REFACTOR THIS HERE FOR TYPESAFETY OF FILE AND FILE[]
+  private deleteFiles(files: (File | File[])[]) {
+    for (const file of files) {
+      if (Array.isArray(file)) this.deleteFiles(file);
+      else this.deleteFile(file as File);
+    }
+  }
+
+  private deleteFile(file: File) {
+    fs.unlinkSync(file.path);
+    this.deleteEmptyDirectories(file.path);
   }
 
   private async save(req: Request, uploadDir: string): Promise<File> {
-    const form = this.initializeUploadForm(uploadDir);
-    const filesMap = await this.parseRequest(req, form);
-    const files = Object.values(filesMap) as File[];
-    if (files.length !== 1 || files[0].size == 0) {
-      this.deleteFiles(files);
-      throw new Error("You should submit exactly one file.");
+    const form: Formidable = this.initializeUploadForm(uploadDir);
+    const files: Files = this.parseRequest(req, form);
+
+    try {
+      const file: File = this.getFile(files);
+      this.validateFileType(file);
+      return file;
+    } catch (error) {
+      this.deleteFiles(Object.values(files));
+      throw error;
     }
-    if (!this.isSupportedFileType(files[0])) {
-      this.deleteFiles(files);
+  }
+
+  private getFile(files: Files): File {
+    const file = Object.values(files);
+    const isSingleFile = file.length === 1 && Array.isArray(file[0]) && file[0].length !== 0;
+
+    if (!isSingleFile) throw new Error("You should submit exactly one file.");
+
+    return file[0] as File;
+  }
+
+  private validateFileType(file: File): void {
+    const fileTypes = this.supportedFileExtensions.join("|");
+    const supportedFiletypesRegEx = new RegExp(`\.(${fileTypes})$`, "i");
+    const isSupportedFileType = file.path.match(supportedFiletypesRegEx) ? true : false;
+
+    if (!isSupportedFileType) {
+      const supportedFileTypes = `${this.supportedFileExtensions.join(", ")}`;
       throw new TypeError(
-        `Invalid file type. The server only accepts files with one the following extensions: ${this.supportedFileExtensions.join(
-          ", "
-        )}.`
+        `Invalid file type. The server only accepts files with one the following extensions: ${supportedFileTypes}.`
       );
     }
-    return files[0] as File;
   }
 
   private validateRequest(req: Request): void {
@@ -139,6 +166,6 @@ export default class FileService {
     const uploadDir: string = this.uploadDirectory(req.params.context, req.params.fhirId);
     this.createDirIfNotExists(uploadDir);
     const file = await this.save(req, uploadDir);
-    return this.formatResponse(file)
+    return this.formatResponse(file);
   }
 }
