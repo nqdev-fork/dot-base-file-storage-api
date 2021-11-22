@@ -21,14 +21,19 @@ export default class FileService {
     return fs.mkdirSync(path, { recursive: true });
   }
 
+  private isDirectoryTraversalAttack(filepath: string): boolean {
+    // normalized paths resolve '..' and '.', making
+    // directory traversal attacks visible.
+    const normalizedPath = path.normalize(filepath);
+    const isTraversalAttack = filepath.startsWith(normalizedPath);
+    return isTraversalAttack;
+  }
+
   private getUniqueFilePath(file: File, uploadDirectory: string): string {
     const fileExtension = /\.\w+$/g.exec(file.path);
     const uniquePath = `${uploadDirectory}/${uuid()}${fileExtension}`;
-    //REVIEW: REPLACE COMMENT WITH DECRIPTIVE NAMING
-    const preventTraversalAttack = uniquePath.startsWith(uploadDirectory);
 
-    //REVIEW: Happy PATH SHOULD BE DEFAULT PATH + THROW ERROR HERE?
-    if (!preventTraversalAttack) {
+    if (this.isDirectoryTraversalAttack(uniquePath)) {
       throw new Error("Invalid upload directory.");
     }
 
@@ -45,23 +50,22 @@ export default class FileService {
       maxFileSize: 4000 * 1024 * 1024, // = 4 gb
     });
 
-    form.on("fileBegin", (name, file) => {
+    form.on("fileBegin", (_, file) => {
       file.path = this.getUniqueFilePath(file, uploadDirectory);
     });
 
     return form;
   }
 
-  //REVIEW:
-  private parseRequest(req: Request, form: Formidable): Files {
-    let uploadFiles: Files = {};
-
-    form.parse(req, (err, fields, files) => {
-      if (err !== null) throw new Error(`Parsing of uploaded files failed: ${err}.`);
-      else uploadFiles = files;
+  private async parseRequest(req: Request, form: Formidable): Promise<Files> {
+    // Formidable's API is based on callbacks, which
+    // we want to promisify so we can await the parsing.
+    return new Promise(function (resolve, reject) {
+      form.parse(req, function (err, _, files: Files) {
+        if (err !== null) reject(err);
+        else resolve(files);
+      });
     });
-
-    return uploadFiles;
   }
 
   private urlOf(filepath: string): string {
@@ -71,24 +75,27 @@ export default class FileService {
     return url.href;
   }
 
-  //REVIEW: SHOULDN'T USING 'recursive:true' WORK HERE?
-  //OTHERWISE I WOULD ADD AT LEAST A 2nd FUNCTION 'deleteDirectory'
-  private deleteEmptyDirectories(filepath: string) {
+  private deleteDirectoryIfEmpty(dir: string) {
     try {
-      const directory = path.dirname(filepath);
-      fs.rmdirSync(directory, { recursive: true });
-    } catch (e) {
-      //REVIEW: AVOID COMMENTS WITH DECRIPTIVE NAMING
-      const fileAlreadyExists = "ENOTEMPTY";
-      const noFileSaved = "EACCES";
-      if (e.code === fileAlreadyExists) return;
-      //In this case file is saved in /tmp/<random>,but /tmp may not be deleted
-      if (e.code === noFileSaved) return;
-      throw e;
+      if (!fs.existsSync(dir)) return;
+      if (fs.readdirSync(dir).length > 0) return;
+      fs.rmdirSync(dir);
+    } catch (error) {
+      // In this case file is saved in /tmp/<random>, but /tmp may not be deleted.
+      const emptyFileSent = "EACCES";
+      if (error.code === emptyFileSent) return;
+
+      throw error;
     }
   }
 
-  //REVIEW: I WOULD REFACTOR THIS HERE FOR TYPESAFETY OF FILE AND FILE[]
+  private deleteEmptyDirectories(filepath: string) {
+    const subDirs = path.dirname(filepath).split("/");
+    const fullSubDirs = subDirs.map((_, index) => subDirs.slice(0, index + 1).join("/"));
+    const fullSubDirsReversed = fullSubDirs.reverse();
+    fullSubDirsReversed.forEach((dir) => this.deleteDirectoryIfEmpty(dir));
+  }
+
   private deleteFiles(files: (File | File[])[]) {
     for (const file of files) {
       if (Array.isArray(file)) this.deleteFiles(file);
@@ -97,16 +104,17 @@ export default class FileService {
   }
 
   private deleteFile(file: File) {
+    if (!fs.existsSync(file.path)) return;
     fs.unlinkSync(file.path);
     this.deleteEmptyDirectories(file.path);
   }
 
   private async save(req: Request, uploadDir: string): Promise<File> {
     const form: Formidable = this.initializeUploadForm(uploadDir);
-    const files: Files = this.parseRequest(req, form);
+    const files: Files = await this.parseRequest(req, form);
 
     try {
-      const file: File = this.getFile(files);
+      const file: File = this.getSingleFileOrThrow(files);
       this.validateFileType(file);
       return file;
     } catch (error) {
@@ -115,9 +123,9 @@ export default class FileService {
     }
   }
 
-  private getFile(files: Files): File {
+  private getSingleFileOrThrow(files: Files): File {
     const file = Object.values(files);
-    const isSingleFile = file.length === 1 && Array.isArray(file[0]) && file[0].length !== 0;
+    const isSingleFile = file.length === 1 || (Array.isArray(file[0]) && file[0].length !== 0);
 
     if (!isSingleFile) throw new Error("You should submit exactly one file.");
 
