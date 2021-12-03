@@ -25,7 +25,7 @@ export default class FileService {
     // normalized paths resolve '..' and '.', making
     // directory traversal attacks visible.
     const normalizedPath = path.normalize(filepath);
-    const isTraversalAttack = filepath.startsWith(normalizedPath);
+    const isTraversalAttack = !filepath.endsWith(normalizedPath);
     return isTraversalAttack;
   }
 
