@@ -69,9 +69,11 @@ export default class FileService {
   }
 
   private urlOf(filepath: string): string {
+    // Convert absolute filePaths to relative path in order to create a valid url
+    const path = filepath.replace(new RegExp("^(\/)"), "./");
     const protocol = process.env.NODE_ENV === "development" ? "http://" : "https://";
     const domain = process.env.DOMAIN ?? "localhost";
-    const url = new URL(filepath, `${protocol}${domain}/api/`);
+    const url = new URL(path, `${protocol}${domain}/api/`);
     return url.href;
   }
 
