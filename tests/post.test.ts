@@ -2,7 +2,7 @@ import request from "supertest"
 import app from "@/app"
 import { deleteAllFiles, fileExtension, localFilepath, uploadedFileToExist } from "./utils"
 
-describe("File Upload", () => {
+describe("File Upload POST", () => {
     const pathToPdfFile = "./tests/mocks/sample.pdf"
     const pathToSvgFile = "./tests/mocks/drawing.svg"
 
@@ -52,5 +52,4 @@ describe("File Upload", () => {
             expect(uploadedFileToExist(res)).toBeFalsy()
         })
     })
-
 })

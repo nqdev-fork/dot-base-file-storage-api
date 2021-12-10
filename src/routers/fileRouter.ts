@@ -4,6 +4,8 @@ import FileService from "@/services/FileService";
 const router: express.Router = express.Router();
 const fileService = new FileService();
 
+router.use("/", express.static(fileService.baseDir));
+
 router.post("/:context/:fhirId", async (req, res) => {
   try {
     const fhirAttachment = await fileService.handleUpload(req);
