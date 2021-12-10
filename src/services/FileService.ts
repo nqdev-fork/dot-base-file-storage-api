@@ -10,10 +10,12 @@ import { v4 as uuid } from "uuid";
 export default class FileService {
   private supportedFileExtensions = ["jpg", "json", "mp4", "pdf", "ply", "png"];
 
+  public get baseDir(): string {
+    return process.env.NODE_ENV === "development" ? `./files` : `/files`; 
+  }
+
   private uploadDirectory(context: string, fhirId: string): string {
-    return process.env.NODE_ENV === "development"
-      ? `./files/${context}/${fhirId}`
-      : `/files/${context}/${fhirId}`;
+    return `${this.baseDir}/${context}/${fhirId}`
   }
 
   private createDirIfNotExists(path: string) {

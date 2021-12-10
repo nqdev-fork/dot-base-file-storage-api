@@ -18,3 +18,13 @@ export function uploadedFileToExist(res: request.Response): boolean {
 export function fileExtension(path: string): string {
     return /\.\w+$/g.exec(path)?.[0] || "";
 }
+
+export function copyToFileStorage(fromFile: string, toDir: string, destFileName: string) {
+    fs.mkdirSync(toDir, {recursive: true});
+    fs.copyFileSync(fromFile, `${toDir}${destFileName}`)
+}
+
+export function isBufferSameAsFile(buffer: Buffer, filePath:string): boolean {
+    const fileBuffer = fs.readFileSync(filePath)
+    return fileBuffer.equals(buffer)
+}
