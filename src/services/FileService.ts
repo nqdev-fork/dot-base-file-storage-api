@@ -11,11 +11,11 @@ export default class FileService {
   private supportedFileExtensions = ["jpg", "json", "mp4", "pdf", "ply", "png"];
 
   public get baseDir(): string {
-    return process.env.NODE_ENV === "development" ? `./files` : `/files`; 
+    return process.env.NODE_ENV === "development" ? `./files` : `/files`;
   }
 
   private uploadDirectory(context: string, fhirId: string): string {
-    return `${this.baseDir}/${context}/${fhirId}`
+    return `${this.baseDir}/${context}/${fhirId}`;
   }
 
   private createDirIfNotExists(path: string) {
@@ -72,7 +72,7 @@ export default class FileService {
 
   private urlOf(filepath: string): string {
     // Convert absolute filePaths to relative path in order to create a valid url
-    const path = filepath.replace(new RegExp("^(\/)"), "./");
+    const path = filepath.replace(new RegExp("^(/)"), "./");
     const protocol = process.env.NODE_ENV === "development" ? "http://" : "https://";
     const domain = process.env.DOMAIN ?? "localhost";
     const url = new URL(path, `${protocol}${domain}/api/`);
@@ -119,7 +119,7 @@ export default class FileService {
 
     try {
       const file: File = this.getSingleFileOrThrow(files);
-      this.validateFileType(file);
+      file.type = this.setFileType(file.path);
       return file;
     } catch (error) {
       this.deleteFiles(Object.values(files));
@@ -136,16 +136,27 @@ export default class FileService {
     return file[0] as File;
   }
 
-  private validateFileType(file: File): void {
-    const fileTypes = this.supportedFileExtensions.join("|");
-    const supportedFiletypesRegEx = new RegExp(`\.(${fileTypes})$`, "i");
-    const isSupportedFileType = file.path.match(supportedFiletypesRegEx) ? true : false;
-
-    if (!isSupportedFileType) {
-      const supportedFileTypes = `${this.supportedFileExtensions.join(", ")}`;
-      throw new TypeError(
+  private setFileType(fileName: string): string | null{
+    const fileType = fileName.split(".").pop();
+    switch (fileType) {
+      case "ply":
+        return "model/ply";
+      case "png":
+        return "image/png";
+      case "pdf":
+        return "application/pdf";
+      case "jpg":
+        return "image/jpeg";
+      case "mp4":
+        return "video/mp4";
+      case "json":
+        return "application/json";
+      default: {
+        const supportedFileTypes = `${this.supportedFileExtensions.join(", ")}`;
+        throw new TypeError(
         `Invalid file type. The server only accepts files with one the following extensions: ${supportedFileTypes}.`
       );
+      }
     }
   }
 
