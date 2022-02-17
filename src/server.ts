@@ -1,3 +1,4 @@
+import { Server as HttpServer } from "http";
 import { Express } from "express";
 import cors from "cors";
 import * as Sentry from "@sentry/node";
@@ -38,8 +39,17 @@ class StorageApi {
       app.use(Sentry.Handlers.errorHandler());
     }
 
-    app.listen(StorageApi.port, () => {
+    const server = app.listen(StorageApi.port, () => {
       console.log(`Server listening on ${StorageApi.port}`);
+    });
+
+    process.on("SIGTERM", () => this.shutdownApiServer(server));
+    process.on("SIGINT", () => this.shutdownApiServer(server));
+  }
+
+  private async shutdownApiServer(server: HttpServer) {
+    server.close(() => {
+      console.log("Server has gracefully shut down");
     });
   }
 

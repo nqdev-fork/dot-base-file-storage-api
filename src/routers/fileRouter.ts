@@ -10,12 +10,11 @@ router.post("/:context/:fhirId", async (req, res) => {
   try {
     const fhirAttachment = await fileService.handleUpload(req);
     res.status(200).send(fhirAttachment);
-  } catch (e) {
-    if (e instanceof TypeError) {
-      res.status(415).send(e.message);
-      return;
-    }
-    res.status(500).send(e.message);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    if (e instanceof TypeError) res.status(415).send(e.message);
+    else res.status(500).send(e.message);
   }
 });
 

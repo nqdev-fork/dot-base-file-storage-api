@@ -84,7 +84,9 @@ export default class FileService {
       if (!fs.existsSync(dir)) return;
       if (fs.readdirSync(dir).length > 0) return;
       fs.rmdirSync(dir);
-    } catch (error) {
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       // In this case file is saved in /tmp/<random>, but /tmp may not be deleted.
       const emptyFileSent = "EACCES";
       if (error.code === emptyFileSent) return;
@@ -136,7 +138,7 @@ export default class FileService {
     return file[0] as File;
   }
 
-  private setFileType(fileName: string): string | null{
+  private setFileType(fileName: string): string | null {
     const fileType = fileName.split(".").pop();
     switch (fileType) {
       case "ply":
@@ -154,8 +156,8 @@ export default class FileService {
       default: {
         const supportedFileTypes = `${this.supportedFileExtensions.join(", ")}`;
         throw new TypeError(
-        `Invalid file type. The server only accepts files with one the following extensions: ${supportedFileTypes}.`
-      );
+          `Invalid file type. The server only accepts files with one the following extensions: ${supportedFileTypes}.`
+        );
       }
     }
   }
