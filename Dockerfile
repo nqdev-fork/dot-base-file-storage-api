@@ -15,5 +15,8 @@ RUN apk add dumb-init
 ENV NODE_ENV production
 WORKDIR /usr/src/app
 COPY --from=builder --chown=node:node /usr/src/app-build .
+RUN mkdir /files
+RUN chown node /files
+RUN chmod u+rwx,g-rwx,o-rwx /files
 USER node
 CMD ["dumb-init", "node", "-r", "tsconfig-paths/register", "build/server.js"]
