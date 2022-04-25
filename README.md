@@ -6,6 +6,7 @@ API submit files using multipart forms and statically serve them afterwards.
 
 ## Quick Nav
 1. [Production Deployment](#Production-Deployment)
+1. [Configuration](#Configuration)
 1. [Contributing](#Contributing)
 
 ## Production Deployment
@@ -22,7 +23,7 @@ Want a File Storage API of your own? The easiest way is to deploy our docker con
 1. Set the `DOMAIN` environment variable. e.g.:
     ```
     export DOMAIN=localhost:3000 // or
-    export DOMAIN=github.com
+    export DOMAIN=yourdomain.com
     ```
 1. Start the container with a single command
     ```
@@ -30,28 +31,22 @@ Want a File Storage API of your own? The easiest way is to deploy our docker con
     ```
 1. Done and dusted 🎉. The File Storage API is available on port 3000.
 
+## Configuration
+
+| Variable Name | Default | Example |
+| --- | --- | --- |
+| DOMAIN | - | yourdomain.com |
 
 ## Contributing
 
 This project is written in Typescript. For an introduction into the language and best practices see the [typescript documentation](https://www.typescriptlang.org/docs/home.html).
 
-### Requirements
-- [Node.js >= v12](https://nodejs.org/en/)
-- A local copy of this repository
+You will need `docker`, `git`, `jq` and `openssl`. Checkout a local copy of this repository, `cd` into it and run:
+```bash
+./launch-stack.sh
+```
+Follow the steps on the screen.
 
-### Running Locally
-1. Install all dependencies
-    ```
-    npm install
-    ```
-1. Set the `DOMAIN` environment variable. e.g.:
-    ```
-    export DOMAIN=localhost:3000
-    ```
-1. Start the development server
-    ```
-    npm start
-    ```
-1. By default the server is available at http://localhost:3000.
-1. Go and mix up some code 👩‍💻. The server will reload automatically once you save. Remember to keep an eye on the console.
+By default the server is available at http://localhost:3000.
 
+Go and mix up some code 👩‍💻. The server will reload automatically once you save. Remember to keep an eye on the console.
