@@ -20,7 +20,7 @@ yarn-error.log*
 *.sln
 *.sw?
 
-# Local files tree
+# Locally stored files tree
 files/
 
 # Local dot-base checkout for running the stack
