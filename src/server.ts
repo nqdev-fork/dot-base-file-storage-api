@@ -1,6 +1,5 @@
 import { Server as HttpServer } from "http";
 import { Express } from "express";
-import cors from "cors";
 import app from "@/app";
 import fileRouter from "@/routers/fileRouter";
 
@@ -10,8 +9,6 @@ class StorageApi {
   }
 
   private async startApiServer(app: Express) {
-    app.use(cors());
-
     app.use("/api/files", fileRouter);
 
     const server = app.listen(StorageApi.port, () => {
