@@ -15,8 +15,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*", "build/*"]
-    },
+    }
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "**/__mocks__"],
+  "exclude": ["node_modules", "**/__mocks__"]
 }

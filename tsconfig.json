@@ -4,13 +4,13 @@
     "sourceMap": true,
     "paths": {
       "@/*": ["src/*", "build/*"],
-      "@tests/*": ["tests/*"],
-    },
+      "@tests/*": ["tests/*"]
+    }
   },
   "include": ["src/**/*.ts", "tests/**/*.ts", "tests/setEnvVars.js"],
   "exclude": ["node_modules"],
   "ts-node": {
     "files": true,
-    "require": [ "tsconfig-paths/register" ],
-  },
+    "require": ["tsconfig-paths/register"]
+  }
 }
