@@ -15,28 +15,6 @@
             "problemMatcher": []
         },
         {
-            "label": "Offload services to external workers",
-            "type": "shell",
-            "command": "./dot-base/dot-base.sh offloadExcept dotbase_file-storage-api",
-            "presentation": {
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Pull services to manager",
-            "type": "shell",
-            "command": "./dot-base/dot-base.sh runOnManager",
-            "presentation": {
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
             "label": "Watch Stack",
             "type": "shell",
             "command": "./dot-base/dot-base.sh watch",
@@ -84,6 +62,17 @@
             "label": "Start Server",
             "type": "shell",
             "command": "docker exec -it $(docker ps -q -f name=dotbase_file-storage-api) npm start",
+            "presentation": {
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Tests",
+            "type": "shell",
+            "command": "docker exec -it $(docker ps -q -f name=dotbase_file-storage-api) npm run test",
             "presentation": {
                 "reveal": "always",
                 "focus": true,

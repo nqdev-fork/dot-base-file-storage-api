@@ -32,7 +32,7 @@ export default class FileService {
   }
 
   private getUniqueFilePath(file: File, uploadDirectory: string): string {
-    const fileExtension = /\.\w+$/g.exec(file.path);
+    const fileExtension = /\.\w+$/g.exec(file.filepath);
     const uniquePath = `${uploadDirectory}/${uuid()}${fileExtension}`;
 
     if (this.isDirectoryTraversalAttack(uniquePath)) {
@@ -53,7 +53,7 @@ export default class FileService {
     });
 
     form.on("fileBegin", (_, file) => {
-      file.path = this.getUniqueFilePath(file, uploadDirectory);
+      file.filepath = this.getUniqueFilePath(file, uploadDirectory);
     });
 
     return form;
@@ -110,9 +110,9 @@ export default class FileService {
   }
 
   private deleteFile(file: File) {
-    if (!fs.existsSync(file.path)) return;
-    fs.unlinkSync(file.path);
-    this.deleteEmptyDirectories(file.path);
+    if (!fs.existsSync(file.filepath)) return;
+    fs.unlinkSync(file.filepath);
+    this.deleteEmptyDirectories(file.filepath);
   }
 
   private async save(req: Request, uploadDir: string): Promise<File> {
@@ -121,7 +121,7 @@ export default class FileService {
 
     try {
       const file: File = this.getSingleFileOrThrow(files);
-      file.type = this.setFileType(file.path);
+      file.mimetype = this.setFileType(file.filepath);
       return file;
     } catch (error) {
       this.deleteFiles(Object.values(files));
@@ -171,18 +171,17 @@ export default class FileService {
   }
 
   private formatResponse(file: File): fhir.IAttachment {
-    const { type, name, path, lastModifiedDate } = file;
+    const { mimetype, newFilename, filepath } = file;
     const missingFieldError = "The uploaded file is missing a required field";
-    if (type === null) throw new TypeError(`${missingFieldError} 'type'.`);
-    if (name === null) throw new Error(`${missingFieldError} 'name'.`);
-    if (path === null) throw new Error(`${missingFieldError} 'path'.`);
-    if (!lastModifiedDate) throw new Error(`${missingFieldError} 'lastModifiedDate'`);
+    if (mimetype === null) throw new TypeError(`${missingFieldError} 'mimetype'.`);
+    if (newFilename === null) throw new Error(`${missingFieldError} 'newFilename'.`);
+    if (filepath === null) throw new Error(`${missingFieldError} 'filepath'.`);
 
     return FhirResourceBuilder.attachment(
-      type,
-      name,
-      this.urlOf(path),
-      lastModifiedDate.toISOString()
+      mimetype,
+      newFilename,
+      this.urlOf(filepath),
+      new Date().toISOString()
     );
   }
 
