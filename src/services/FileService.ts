@@ -171,15 +171,15 @@ export default class FileService {
   }
 
   private formatResponse(file: File): fhir.IAttachment {
-    const { mimetype, newFilename, filepath } = file;
+    const { mimetype, originalFilename, filepath } = file;
     const missingFieldError = "The uploaded file is missing a required field";
     if (mimetype === null) throw new TypeError(`${missingFieldError} 'mimetype'.`);
-    if (newFilename === null) throw new Error(`${missingFieldError} 'newFilename'.`);
+    if (originalFilename === null) throw new Error(`${missingFieldError} 'originalFilename'.`);
     if (filepath === null) throw new Error(`${missingFieldError} 'filepath'.`);
 
     return FhirResourceBuilder.attachment(
       mimetype,
-      newFilename,
+      originalFilename,
       this.urlOf(filepath),
       new Date().toISOString()
     );
