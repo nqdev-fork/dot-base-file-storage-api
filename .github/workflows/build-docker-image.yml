@@ -1,8 +1,12 @@
-name: 🐳 Build Docker Image For Branch
+name: 🐳 Build Docker Image
 
 on:
     workflow_dispatch:
         inputs:
+            ref:
+              type: string
+              required: true
+              description: "The ref to build the image from. (usually this is a release tag, e.g. v4.0.1)"
             architecture:
                 type: choice
                 required: true
@@ -14,13 +18,14 @@ on:
             imageTag:
                 type: string
                 required: true
-                description: "For example: 1.0.0"
+                description: "The tag for the docker image. (usually a version tag without leading 'v')"
 
 jobs:
     build-docker-image:
         name: Build Docker Image for ${{ inputs.imageTag }}
-        uses: dot-base/.github/.github/workflows/build-docker-image-manually.yml@main
+        uses: dot-base/.github/.github/workflows/build-docker-image.yml@main
         with:
+            ref: ${{ inputs.ref }}
             architecture: ${{ inputs.architecture }}
             imageTag: ${{ inputs.imageTag }}
         secrets:
