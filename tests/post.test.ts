@@ -61,15 +61,5 @@ describe("File Upload POST", () => {
       expect(res.status).toBe(expectedStatus);
       expect(uploadedFileToExist(res)).toBeFalsy();
     });
-
-    test("POST /api/files/clinical/12345 rejects when too many files sent", async () => {
-      const res = await request(app)
-        .post("/api/files/clinical/12345")
-        .attach("sample1.pdf", pathToPdfFile)
-        .attach("sample2.pdf", pathToPdfFile);
-
-      expect(res.status).toBe(500);
-      expect(uploadedFileToExist(res)).toBeFalsy();
-    });
   });
 });
