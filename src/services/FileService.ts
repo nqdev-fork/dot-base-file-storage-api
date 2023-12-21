@@ -124,7 +124,7 @@ export default class FileService {
       file.mimetype = this.setFileType(file.filepath);
       return file;
     } catch (error) {
-      this.deleteFiles(Object.values(files));
+      this.deleteFiles(Object.values(files) as unknown as File[]);
       throw error;
     }
   }
@@ -135,7 +135,7 @@ export default class FileService {
 
     if (!isSingleFile) throw new Error("You should submit exactly one file.");
 
-    return file[0] as File;
+    return file[0]![0] as File;
   }
 
   private setFileType(fileName: string): string | null {
@@ -156,7 +156,7 @@ export default class FileService {
       default: {
         const supportedFileTypes = `${this.supportedFileExtensions.join(", ")}`;
         throw new TypeError(
-          `Invalid file type. The server only accepts files with one the following extensions: ${supportedFileTypes}.`
+          `Invalid file type. The server only accepts files with one the following extensions: ${supportedFileTypes}.`,
         );
       }
     }
@@ -181,7 +181,7 @@ export default class FileService {
       mimetype,
       originalFilename,
       this.urlOf(filepath),
-      new Date().toISOString()
+      new Date().toISOString(),
     );
   }
 

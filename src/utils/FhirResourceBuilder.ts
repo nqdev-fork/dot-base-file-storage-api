@@ -5,7 +5,7 @@ export default class FhirResourceBuilder {
     mimetype: string,
     title: string,
     url: string,
-    creation: string
+    creation: string,
   ): fhir.IAttachment {
     const attachment: fhir.IAttachment = {
       contentType: mimetype,
